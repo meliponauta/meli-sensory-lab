@@ -14,7 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      honey_samples: {
+        Row: {
+          created_at: string
+          gosto_acido: string | null
+          gosto_amargo: string | null
+          gosto_doce: string | null
+          gosto_outros: string | null
+          gosto_salgado: string | null
+          id: string
+          notas_extras: string | null
+          odor_descricao: string | null
+          odor_intensidade: string | null
+          origem_botanica: string
+          sabor_descricao: string | null
+          sabor_intensidade: string | null
+          sabor_persistencia: string | null
+          textura_cristais: string | null
+          textura_viscosidade: string | null
+          visual_aspecto: string | null
+          visual_cor: string | null
+          visual_estado_fisico: string | null
+        }
+        Insert: {
+          created_at?: string
+          gosto_acido?: string | null
+          gosto_amargo?: string | null
+          gosto_doce?: string | null
+          gosto_outros?: string | null
+          gosto_salgado?: string | null
+          id?: string
+          notas_extras?: string | null
+          odor_descricao?: string | null
+          odor_intensidade?: string | null
+          origem_botanica: string
+          sabor_descricao?: string | null
+          sabor_intensidade?: string | null
+          sabor_persistencia?: string | null
+          textura_cristais?: string | null
+          textura_viscosidade?: string | null
+          visual_aspecto?: string | null
+          visual_cor?: string | null
+          visual_estado_fisico?: string | null
+        }
+        Update: {
+          created_at?: string
+          gosto_acido?: string | null
+          gosto_amargo?: string | null
+          gosto_doce?: string | null
+          gosto_outros?: string | null
+          gosto_salgado?: string | null
+          id?: string
+          notas_extras?: string | null
+          odor_descricao?: string | null
+          odor_intensidade?: string | null
+          origem_botanica?: string
+          sabor_descricao?: string | null
+          sabor_intensidade?: string | null
+          sabor_persistencia?: string | null
+          textura_cristais?: string | null
+          textura_viscosidade?: string | null
+          visual_aspecto?: string | null
+          visual_cor?: string | null
+          visual_estado_fisico?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
