@@ -8,6 +8,17 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { Slider } from "@/components/ui/slider";
+import {
+  Radar,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+} from "recharts";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -43,6 +54,28 @@ type FormState = {
   notas_extras: string;
 };
 
+const escalaAttrs = [
+  { key: "escala_docura", label: "Doçura" },
+  { key: "escala_acidez", label: "Acidez" },
+  { key: "escala_salinidade", label: "Salinidade" },
+  { key: "escala_amargor", label: "Amargor" },
+  { key: "escala_floral", label: "Floral" },
+  { key: "escala_frutado", label: "Frutado" },
+  { key: "escala_quente", label: "Quente / Aquecido" },
+  { key: "escala_aromatico", label: "Aromático" },
+  { key: "escala_quimico", label: "Químico" },
+  { key: "escala_vegetal", label: "Vegetal" },
+  { key: "escala_animal", label: "Animal" },
+] as const;
+
+type EscalaKey = (typeof escalaAttrs)[number]["key"];
+type EscalaState = Record<EscalaKey, number>;
+
+const emptyEscala: EscalaState = escalaAttrs.reduce(
+  (acc, a) => ({ ...acc, [a.key]: 5 }),
+  {} as EscalaState,
+);
+
 const empty: FormState = {
   origem_botanica: "",
   visual_estado_fisico: "",
@@ -65,6 +98,7 @@ const empty: FormState = {
 
 function Index() {
   const [form, setForm] = useState<FormState>(empty);
+  const [escala, setEscala] = useState<EscalaState>(emptyEscala);
   const [saving, setSaving] = useState(false);
 
   const set = <K extends keyof FormState>(key: K, value: string) =>
@@ -79,10 +113,15 @@ function Index() {
     setSaving(true);
     const payload = Object.fromEntries(
       Object.entries(form).map(([k, v]) => [k, v.trim() === "" ? null : v.trim()]),
-    ) as unknown as FormState;
+    ) as Record<string, string | number | null>;
     payload.origem_botanica = form.origem_botanica.trim();
+    for (const a of escalaAttrs) {
+      payload[a.key] = escala[a.key];
+    }
 
-    const { error } = await supabase.from("honey_samples").insert(payload);
+    const { error } = await supabase
+      .from("honey_samples")
+      .insert(payload as never);
     setSaving(false);
     if (error) {
       toast.error("Erro ao salvar a amostra.", { description: error.message });
@@ -90,7 +129,13 @@ function Index() {
     }
     toast.success("Amostra cadastrada com sucesso!");
     setForm(empty);
+    setEscala(emptyEscala);
   }
+
+  const radarData = escalaAttrs.map((a) => ({
+    atributo: a.label,
+    valor: escala[a.key],
+  }));
 
   return (
     <div className="min-h-screen bg-background">
@@ -216,8 +261,80 @@ function Index() {
             </CardContent>
           </Card>
 
+          <Card>
+            <CardHeader>
+              <CardTitle>Escala de Intensidade Sensorial</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <p className="text-sm text-muted-foreground">
+                Atribua uma nota de 1 a 10 para cada atributo sensorial percebido na
+                amostra. Os valores informados serão utilizados para gerar
+                automaticamente o perfil sensorial do mel no gráfico de radar.
+              </p>
+
+              <div className="space-y-5">
+                {escalaAttrs.map((a) => (
+                  <div key={a.key} className="grid grid-cols-[7rem_1fr_2.5rem] items-center gap-4 sm:grid-cols-[9rem_1fr_2.5rem]">
+                    <Label className="text-sm font-medium text-foreground">{a.label}</Label>
+                    <Slider
+                      min={1}
+                      max={10}
+                      step={1}
+                      value={[escala[a.key]]}
+                      onValueChange={(v) =>
+                        setEscala((s) => ({ ...s, [a.key]: v[0] }))
+                      }
+                    />
+                    <span className="text-right text-sm font-semibold tabular-nums text-primary">
+                      {escala[a.key]}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="rounded-lg border bg-card/40 p-4">
+                <h3 className="text-center text-base font-semibold text-foreground">
+                  Perfil Sensorial do Mel
+                </h3>
+                <div className="h-[380px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RadarChart data={radarData} outerRadius="75%">
+                      <PolarGrid stroke="hsl(var(--border))" />
+                      <PolarAngleAxis
+                        dataKey="atributo"
+                        tick={{ fill: "hsl(var(--foreground))", fontSize: 12 }}
+                      />
+                      <PolarRadiusAxis
+                        angle={90}
+                        domain={[0, 10]}
+                        tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
+                      />
+                      <Radar
+                        name="Intensidade sensorial"
+                        dataKey="valor"
+                        stroke="hsl(var(--primary))"
+                        fill="hsl(var(--primary))"
+                        fillOpacity={0.45}
+                      />
+                      <Tooltip />
+                      <Legend />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           <div className="flex items-center justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => setForm(empty)} disabled={saving}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setForm(empty);
+                setEscala(emptyEscala);
+              }}
+              disabled={saving}
+            >
               Limpar
             </Button>
             <Button type="submit" disabled={saving}>
