@@ -96,6 +96,142 @@ const empty: FormState = {
   notas_extras: "",
 };
 
+const sugestoes: Partial<Record<keyof FormState, string[]>> = {
+  visual_estado_fisico: ["líquido", "cristalizado", "parcialmente cristalizado"],
+  visual_aspecto: [
+    "límpido",
+    "turvo",
+    "homogêneo",
+    "não homogêneo",
+    "cristalização irregular",
+    "manchas brancas (marmorizado)",
+    "separação de fases",
+    "camadas",
+    "bolhas de ar",
+    "espuma",
+    "impurezas",
+  ],
+  visual_cor: [
+    "muito claro",
+    "claro",
+    "médio-claro",
+    "médio",
+    "médio-escuro",
+    "escuro",
+    "muito escuro",
+    "quase incolor",
+    "palha",
+    "amarelo-claro",
+    "âmbar",
+    "âmbar-escuro",
+    "muito âmbar-escuro",
+    "quase preto",
+    "branco",
+    "marfim",
+    "bege-claro",
+    "bege",
+    "bege-escuro",
+    "avelã",
+    "marrom",
+    "tonalidade normal de mel",
+    "amarelo-vivo",
+    "esbranquiçado",
+    "acinzentado",
+    "amarelo",
+    "avermelhado",
+    "alaranjado",
+    "opaco",
+    "brilhante",
+    "fluorescência verde",
+  ],
+  odor_intensidade: ["fraco", "médio", "forte"],
+  odor_descricao: [
+    "floral",
+    "frutado",
+    "cítrico",
+    "vegetal",
+    "herbáceo",
+    "amadeirado",
+    "balsâmico",
+    "resinoso",
+    "mentolado",
+    "caramelo",
+    "baunilha",
+    "mel cozido",
+    "fermentado",
+    "químico",
+    "animal",
+    "cera",
+  ],
+  sabor_intensidade: ["fraca", "média", "forte"],
+  sabor_descricao: [
+    "ausente",
+    "fraco",
+    "médio",
+    "forte",
+    "floral",
+    "frutado",
+    "cítrico",
+    "caramelo",
+    "baunilha",
+    "amadeirado",
+    "herbáceo",
+    "mentolado",
+    "balsâmico",
+  ],
+  sabor_persistencia: ["ausente", "curta", "média", "longa"],
+  gosto_doce: ["fraca", "média", "forte"],
+  gosto_acido: ["ausente", "fraca", "média", "forte"],
+  gosto_salgado: ["ausente", "presente"],
+  gosto_amargo: ["ausente", "fraco", "médio", "forte"],
+  gosto_outros: [
+    "adstringente",
+    "refrescante",
+    "picante (ardido)",
+    "metálico",
+    "tânico",
+  ],
+  textura_viscosidade: [
+    "fluido",
+    "viscosidade normal",
+    "viscoso",
+    "mole",
+    "pastoso",
+    "firme",
+  ],
+  textura_cristais: [
+    "muito fino",
+    "fino",
+    "médio",
+    "grande",
+    "muito grande",
+    "esférico",
+    "angular",
+    "solúvel",
+    "insolúvel",
+    "duro",
+    "arenoso",
+    "aglomerado",
+  ],
+  notas_extras: [],
+};
+
+function listId(key: string) {
+  return `sug-${key}`;
+}
+
+function Suggestions({ field }: { field: keyof FormState }) {
+  const opts = sugestoes[field];
+  if (!opts || opts.length === 0) return null;
+  return (
+    <datalist id={listId(field)}>
+      {opts.map((o) => (
+        <option key={o} value={o} />
+      ))}
+    </datalist>
+  );
+}
+
 function Index() {
   const [form, setForm] = useState<FormState>(empty);
   const [escala, setEscala] = useState<EscalaState>(emptyEscala);
@@ -177,13 +313,16 @@ function Index() {
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2">
               <Field label="Estado físico">
-                <Input value={form.visual_estado_fisico} onChange={(e) => set("visual_estado_fisico", e.target.value)} />
+                <Input list={listId("visual_estado_fisico")} value={form.visual_estado_fisico} onChange={(e) => set("visual_estado_fisico", e.target.value)} />
+                <Suggestions field="visual_estado_fisico" />
               </Field>
               <Field label="Aspecto">
-                <Input value={form.visual_aspecto} onChange={(e) => set("visual_aspecto", e.target.value)} />
+                <Input list={listId("visual_aspecto")} value={form.visual_aspecto} onChange={(e) => set("visual_aspecto", e.target.value)} />
+                <Suggestions field="visual_aspecto" />
               </Field>
               <Field label="Cor" className="sm:col-span-2">
-                <Input value={form.visual_cor} onChange={(e) => set("visual_cor", e.target.value)} />
+                <Input list={listId("visual_cor")} value={form.visual_cor} onChange={(e) => set("visual_cor", e.target.value)} />
+                <Suggestions field="visual_cor" />
               </Field>
             </CardContent>
           </Card>
@@ -194,10 +333,12 @@ function Index() {
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2">
               <Field label="Intensidade">
-                <Input value={form.odor_intensidade} onChange={(e) => set("odor_intensidade", e.target.value)} />
+                <Input list={listId("odor_intensidade")} value={form.odor_intensidade} onChange={(e) => set("odor_intensidade", e.target.value)} />
+                <Suggestions field="odor_intensidade" />
               </Field>
               <Field label="Descrição">
-                <Textarea rows={2} value={form.odor_descricao} onChange={(e) => set("odor_descricao", e.target.value)} />
+                <Input list={listId("odor_descricao")} value={form.odor_descricao} onChange={(e) => set("odor_descricao", e.target.value)} placeholder="Referências pessoais ou roda de odores/aromas" />
+                <Suggestions field="odor_descricao" />
               </Field>
             </CardContent>
           </Card>
@@ -208,27 +349,43 @@ function Index() {
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2">
               <Field label="Intensidade">
-                <Input value={form.sabor_intensidade} onChange={(e) => set("sabor_intensidade", e.target.value)} />
+                <Input list={listId("sabor_intensidade")} value={form.sabor_intensidade} onChange={(e) => set("sabor_intensidade", e.target.value)} />
+                <Suggestions field="sabor_intensidade" />
               </Field>
               <Field label="Descrição">
-                <Textarea rows={2} value={form.sabor_descricao} onChange={(e) => set("sabor_descricao", e.target.value)} />
+                <Input list={listId("sabor_descricao")} value={form.sabor_descricao} onChange={(e) => set("sabor_descricao", e.target.value)} placeholder="Sabor e retrogosto + referências" />
+                <Suggestions field="sabor_descricao" />
               </Field>
               <Field label="Persistência / Retrogosto" className="sm:col-span-2">
-                <Input value={form.sabor_persistencia} onChange={(e) => set("sabor_persistencia", e.target.value)} />
+                <Input list={listId("sabor_persistencia")} value={form.sabor_persistencia} onChange={(e) => set("sabor_persistencia", e.target.value)} />
+                <Suggestions field="sabor_persistencia" />
               </Field>
 
               <div className="sm:col-span-2">
                 <p className="mb-3 text-sm font-medium text-foreground">Gosto básico</p>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <Field label="Doce"><Input value={form.gosto_doce} onChange={(e) => set("gosto_doce", e.target.value)} /></Field>
-                  <Field label="Ácido"><Input value={form.gosto_acido} onChange={(e) => set("gosto_acido", e.target.value)} /></Field>
-                  <Field label="Salgado"><Input value={form.gosto_salgado} onChange={(e) => set("gosto_salgado", e.target.value)} /></Field>
-                  <Field label="Amargo"><Input value={form.gosto_amargo} onChange={(e) => set("gosto_amargo", e.target.value)} /></Field>
+                  <Field label="Doce">
+                    <Input list={listId("gosto_doce")} value={form.gosto_doce} onChange={(e) => set("gosto_doce", e.target.value)} />
+                    <Suggestions field="gosto_doce" />
+                  </Field>
+                  <Field label="Ácido">
+                    <Input list={listId("gosto_acido")} value={form.gosto_acido} onChange={(e) => set("gosto_acido", e.target.value)} />
+                    <Suggestions field="gosto_acido" />
+                  </Field>
+                  <Field label="Salgado">
+                    <Input list={listId("gosto_salgado")} value={form.gosto_salgado} onChange={(e) => set("gosto_salgado", e.target.value)} />
+                    <Suggestions field="gosto_salgado" />
+                  </Field>
+                  <Field label="Amargo">
+                    <Input list={listId("gosto_amargo")} value={form.gosto_amargo} onChange={(e) => set("gosto_amargo", e.target.value)} />
+                    <Suggestions field="gosto_amargo" />
+                  </Field>
                 </div>
               </div>
 
               <Field label="Outros (tânico, metálico, refrescante…)" className="sm:col-span-2">
-                <Input value={form.gosto_outros} onChange={(e) => set("gosto_outros", e.target.value)} />
+                <Input list={listId("gosto_outros")} value={form.gosto_outros} onChange={(e) => set("gosto_outros", e.target.value)} />
+                <Suggestions field="gosto_outros" />
               </Field>
             </CardContent>
           </Card>
@@ -244,10 +401,12 @@ function Index() {
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2">
               <Field label="Viscosidade / Consistência">
-                <Textarea rows={2} value={form.textura_viscosidade} onChange={(e) => set("textura_viscosidade", e.target.value)} />
+                <Input list={listId("textura_viscosidade")} value={form.textura_viscosidade} onChange={(e) => set("textura_viscosidade", e.target.value)} />
+                <Suggestions field="textura_viscosidade" />
               </Field>
               <Field label="Cristais (forma, tamanho, solubilidade…)">
-                <Textarea rows={2} value={form.textura_cristais} onChange={(e) => set("textura_cristais", e.target.value)} />
+                <Input list={listId("textura_cristais")} value={form.textura_cristais} onChange={(e) => set("textura_cristais", e.target.value)} />
+                <Suggestions field="textura_cristais" />
               </Field>
             </CardContent>
           </Card>
