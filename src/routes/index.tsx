@@ -119,7 +119,9 @@ function Index() {
       payload[a.key] = escala[a.key];
     }
 
-    const { error } = await supabase.from("honey_samples").insert(payload);
+    const { error } = await supabase
+      .from("honey_samples")
+      .insert(payload as never);
     setSaving(false);
     if (error) {
       toast.error("Erro ao salvar a amostra.", { description: error.message });
