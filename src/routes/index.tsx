@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ export const Route = createFileRoute("/")({
 });
 
 type FormState = {
+  numero_amostra: string;
   origem_botanica: string;
   visual_estado_fisico: string;
   visual_aspecto: string;
@@ -77,6 +79,7 @@ const emptyEscala: EscalaState = escalaAttrs.reduce(
 );
 
 const empty: FormState = {
+  numero_amostra: "",
   origem_botanica: "",
   visual_estado_fisico: "",
   visual_aspecto: "",
@@ -242,6 +245,10 @@ function Index() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!form.numero_amostra.trim()) {
+      toast.error("Informe o número da amostra.");
+      return;
+    }
     if (!form.origem_botanica.trim()) {
       toast.error("Informe a origem botânica.");
       return;
@@ -278,21 +285,45 @@ function Index() {
       <Toaster richColors position="top-center" />
       <header className="border-b bg-card/60 backdrop-blur">
         <div className="mx-auto max-w-3xl px-6 py-8">
-          <p className="text-xs font-medium uppercase tracking-widest text-primary">
-            Análise Sensorial
-          </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Ficha de Mel de Origem Única
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Descreva a amostra usando suas próprias percepções sensoriais ou atributos da
-            roda de odores/aromas.
-          </p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-widest text-primary">
+                Análise Sensorial
+              </p>
+              <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                Ficha de Mel de Origem Única
+              </h1>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Descreva a amostra usando suas próprias percepções sensoriais ou atributos da
+                roda de odores/aromas.
+              </p>
+            </div>
+            <Link
+              to="/consulta"
+              className="shrink-0 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+            >
+              Consultar amostras
+            </Link>
+          </div>
         </div>
       </header>
 
       <main className="mx-auto max-w-3xl px-6 py-8">
         <form onSubmit={onSubmit} className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Número da amostra</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Input
+                required
+                value={form.numero_amostra}
+                onChange={(e) => set("numero_amostra", e.target.value)}
+                placeholder="Ex.: 001, AM-2026-01…"
+              />
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Origem botânica</CardTitle>
