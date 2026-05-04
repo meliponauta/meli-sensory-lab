@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/amostras")({
   component: ListaAmostras,
@@ -104,7 +105,7 @@ function ListaAmostras() {
                     <Link
                       to="/consulta"
                       search={{ numero: it.numero_amostra ?? "" }}
-                      className="flex items-center justify-between gap-4 py-3 transition-colors hover:bg-accent/40"
+                      className="group flex items-center justify-between gap-4 rounded-md px-2 py-3 transition-colors hover:bg-accent/40"
                     >
                       <div className="min-w-0">
                         <p className="font-semibold text-foreground">
@@ -114,9 +115,15 @@ function ListaAmostras() {
                           {it.origem_botanica}
                         </p>
                       </div>
-                      <span className="shrink-0 text-xs text-muted-foreground">
-                        {new Date(it.created_at).toLocaleDateString("pt-BR")}
-                      </span>
+                      <div className="flex shrink-0 items-center gap-3">
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(it.created_at).toLocaleDateString("pt-BR")}
+                        </span>
+                        <span className="hidden items-center gap-1 text-xs font-medium text-primary sm:inline-flex">
+                          Ver detalhes
+                          <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                        </span>
+                      </div>
                     </Link>
                   </li>
                 ))}
