@@ -35,6 +35,7 @@ export type Database = {
           gosto_salgado: string | null
           id: string
           notas_extras: string | null
+          numero_amostra: string | null
           odor_descricao: string | null
           odor_intensidade: string | null
           origem_botanica: string
@@ -67,6 +68,7 @@ export type Database = {
           gosto_salgado?: string | null
           id?: string
           notas_extras?: string | null
+          numero_amostra?: string | null
           odor_descricao?: string | null
           odor_intensidade?: string | null
           origem_botanica: string
@@ -99,6 +101,7 @@ export type Database = {
           gosto_salgado?: string | null
           id?: string
           notas_extras?: string | null
+          numero_amostra?: string | null
           odor_descricao?: string | null
           odor_intensidade?: string | null
           origem_botanica?: string
