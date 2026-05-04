@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +21,7 @@ import {
 
 export const Route = createFileRoute("/consulta")({
   component: Consulta,
+  validateSearch: z.object({ numero: z.string().optional() }),
   head: () => ({
     meta: [
       { title: "Consulta de Amostras — Análise Sensorial de Mel" },
@@ -70,13 +72,13 @@ const camposTexto: { key: string; label: string; section: string }[] = [
 type Sample = Record<string, string | number | null>;
 
 function Consulta() {
-  const [numero, setNumero] = useState("");
+  const { numero: numeroQS } = Route.useSearch();
+  const [numero, setNumero] = useState(numeroQS ?? "");
   const [loading, setLoading] = useState(false);
   const [resultados, setResultados] = useState<Sample[] | null>(null);
 
-  async function buscar(e: React.FormEvent) {
-    e.preventDefault();
-    if (!numero.trim()) {
+  async function executarBusca(valor: string, silencioso = false) {
+    if (!valor.trim()) {
       toast.error("Informe o número da amostra.");
       return;
     }
@@ -84,7 +86,7 @@ function Consulta() {
     const { data, error } = await supabase
       .from("honey_samples")
       .select("*")
-      .eq("numero_amostra", numero.trim())
+      .eq("numero_amostra", valor.trim())
       .order("created_at", { ascending: false });
     setLoading(false);
     if (error) {
@@ -92,10 +94,22 @@ function Consulta() {
       return;
     }
     setResultados((data ?? []) as Sample[]);
-    if (!data || data.length === 0) {
+    if ((!data || data.length === 0) && !silencioso) {
       toast.message("Nenhuma amostra encontrada com esse número.");
     }
   }
+
+  async function buscar(e: React.FormEvent) {
+    e.preventDefault();
+    await executarBusca(numero);
+  }
+
+  useEffect(() => {
+    if (numeroQS && numeroQS.trim()) {
+      void executarBusca(numeroQS, true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [numeroQS]);
 
   // Agrupar campos de texto por seção
   const sections = Array.from(new Set(camposTexto.map((c) => c.section)));
@@ -117,12 +131,20 @@ function Consulta() {
                 Informe o número da amostra para visualizar os dados sensoriais cadastrados.
               </p>
             </div>
-            <Link
-              to="/"
-              className="shrink-0 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-            >
-              Nova amostra
-            </Link>
+            <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+              <Link
+                to="/amostras"
+                className="rounded-md border border-input bg-background px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+              >
+                Ver todas as amostras
+              </Link>
+              <Link
+                to="/"
+                className="rounded-md border border-input bg-background px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+              >
+                Nova amostra
+              </Link>
+            </div>
           </div>
         </div>
       </header>
