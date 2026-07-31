@@ -245,12 +245,16 @@ function Consulta() {
                     <div className="space-y-6">
                       <GrupoResultado
                         titulo="Gostos"
+                        graficoTitulo="Perfil Gustativo"
+                        legenda="Intensidade"
                         attrs={gostoAttrs}
                         sample={sample}
                         data={gostoData}
                       />
                       <GrupoResultado
                         titulo="Aromas"
+                        graficoTitulo="Perfil de Aromas"
+                        legenda="Intensidade de Aromas"
                         attrs={aromaAttrs}
                         sample={sample}
                         data={aromaData}
@@ -268,11 +272,15 @@ function Consulta() {
 
 function GrupoResultado({
   titulo,
+  graficoTitulo,
+  legenda,
   attrs,
   sample,
   data,
 }: {
   titulo: string;
+  graficoTitulo: string;
+  legenda: string;
   attrs: ReadonlyArray<{ key: string; label: string }>;
   sample: Record<string, unknown>;
   data: { atributo: string; valor: number }[];
@@ -296,7 +304,7 @@ function GrupoResultado({
 
       <div className="mt-4 rounded-lg border bg-card/40 p-4">
         <h5 className="text-center text-base font-semibold text-foreground">
-          Perfil de {titulo}
+          {graficoTitulo}
         </h5>
         <div className="h-[340px] w-full sm:h-[380px]">
           <ResponsiveContainer width="100%" height="100%">
@@ -312,7 +320,7 @@ function GrupoResultado({
                 tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
               />
               <Radar
-                name={`Perfil de ${titulo.toLowerCase()}`}
+                name={legenda}
                 dataKey="valor"
                 stroke="hsl(var(--primary))"
                 fill="hsl(var(--primary))"
