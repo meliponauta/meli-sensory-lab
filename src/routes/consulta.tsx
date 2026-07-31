@@ -34,18 +34,24 @@ export const Route = createFileRoute("/consulta")({
   }),
 });
 
-const escalaAttrs = [
+const gostoAttrs = [
   { key: "escala_docura", label: "Doçura" },
   { key: "escala_acidez", label: "Acidez" },
   { key: "escala_salinidade", label: "Salinidade" },
   { key: "escala_amargor", label: "Amargor" },
+  { key: "escala_umami", label: "Umami" },
+] as const;
+
+const aromaAttrs = [
   { key: "escala_floral", label: "Floral" },
   { key: "escala_frutado", label: "Frutado" },
   { key: "escala_quente", label: "Quente / Aquecido" },
   { key: "escala_aromatico", label: "Aromático" },
-  { key: "escala_quimico", label: "Químico" },
   { key: "escala_vegetal", label: "Vegetal" },
+  { key: "escala_amadeirado", label: "Amadeirado" },
+  { key: "escala_quimico", label: "Químico" },
   { key: "escala_animal", label: "Animal" },
+  { key: "escala_alterado", label: "Alterado / Fermentativo" },
 ] as const;
 
 const camposTexto: { key: string; label: string; section: string }[] = [
