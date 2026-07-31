@@ -245,12 +245,16 @@ function Consulta() {
                     <div className="space-y-6">
                       <GrupoResultado
                         titulo="Gostos"
+                        graficoTitulo="Perfil Gustativo"
+                        legenda="Intensidade"
                         attrs={gostoAttrs}
                         sample={sample}
                         data={gostoData}
                       />
                       <GrupoResultado
                         titulo="Aromas"
+                        graficoTitulo="Perfil de Aromas"
+                        legenda="Intensidade de Aromas"
                         attrs={aromaAttrs}
                         sample={sample}
                         data={aromaData}
