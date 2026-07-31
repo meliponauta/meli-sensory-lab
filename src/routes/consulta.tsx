@@ -34,18 +34,24 @@ export const Route = createFileRoute("/consulta")({
   }),
 });
 
-const escalaAttrs = [
+const gostoAttrs = [
   { key: "escala_docura", label: "Doçura" },
   { key: "escala_acidez", label: "Acidez" },
   { key: "escala_salinidade", label: "Salinidade" },
   { key: "escala_amargor", label: "Amargor" },
+  { key: "escala_umami", label: "Umami" },
+] as const;
+
+const aromaAttrs = [
   { key: "escala_floral", label: "Floral" },
   { key: "escala_frutado", label: "Frutado" },
   { key: "escala_quente", label: "Quente / Aquecido" },
   { key: "escala_aromatico", label: "Aromático" },
-  { key: "escala_quimico", label: "Químico" },
   { key: "escala_vegetal", label: "Vegetal" },
+  { key: "escala_amadeirado", label: "Amadeirado" },
+  { key: "escala_quimico", label: "Químico" },
   { key: "escala_animal", label: "Animal" },
+  { key: "escala_alterado", label: "Alterado / Fermentativo" },
 ] as const;
 
 const camposTexto: { key: string; label: string; section: string }[] = [
@@ -179,10 +185,15 @@ function Consulta() {
 
         {resultados &&
           resultados.map((sample) => {
-            const radarData = escalaAttrs.map((a) => ({
-              atributo: a.label,
-              valor: typeof sample[a.key] === "number" ? (sample[a.key] as number) : 0,
-            }));
+            const toData = (
+              attrs: ReadonlyArray<{ key: string; label: string }>,
+            ) =>
+              attrs.map((a) => ({
+                atributo: a.label,
+                valor: typeof sample[a.key] === "number" ? (sample[a.key] as number) : 0,
+              }));
+            const gostoData = toData(gostoAttrs);
+            const aromaData = toData(aromaAttrs);
             const dataCriacao = sample.created_at
               ? new Date(String(sample.created_at)).toLocaleString("pt-BR")
               : "";
@@ -231,49 +242,19 @@ function Consulta() {
                     <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-primary">
                       Escala de Intensidade Sensorial
                     </h3>
-                    <div className="grid gap-1 sm:grid-cols-2">
-                      {escalaAttrs.map((a) => (
-                        <div
-                          key={a.key}
-                          className="flex items-center justify-between border-b border-border/40 py-1"
-                        >
-                          <Label className="text-sm text-foreground">{a.label}</Label>
-                          <span className="text-sm font-semibold tabular-nums text-primary">
-                            {sample[a.key] ?? "—"}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="mt-4 rounded-lg border bg-card/40 p-4">
-                      <h4 className="text-center text-base font-semibold text-foreground">
-                        Perfil Sensorial do Mel
-                      </h4>
-                      <div className="h-[380px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <RadarChart data={radarData} outerRadius="75%">
-                            <PolarGrid stroke="hsl(var(--border))" />
-                            <PolarAngleAxis
-                              dataKey="atributo"
-                              tick={{ fill: "hsl(var(--foreground))", fontSize: 12 }}
-                            />
-                            <PolarRadiusAxis
-                              angle={90}
-                              domain={[0, 10]}
-                              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
-                            />
-                            <Radar
-                              name="Intensidade sensorial"
-                              dataKey="valor"
-                              stroke="hsl(var(--primary))"
-                              fill="hsl(var(--primary))"
-                              fillOpacity={0.45}
-                            />
-                            <Tooltip />
-                            <Legend />
-                          </RadarChart>
-                        </ResponsiveContainer>
-                      </div>
+                    <div className="space-y-6">
+                      <GrupoResultado
+                        titulo="Gostos"
+                        attrs={gostoAttrs}
+                        sample={sample}
+                        data={gostoData}
+                      />
+                      <GrupoResultado
+                        titulo="Aromas"
+                        attrs={aromaAttrs}
+                        sample={sample}
+                        data={aromaData}
+                      />
                     </div>
                   </div>
                 </CardContent>
@@ -282,5 +263,67 @@ function Consulta() {
           })}
       </main>
     </div>
+  );
+}
+
+function GrupoResultado({
+  titulo,
+  attrs,
+  sample,
+  data,
+}: {
+  titulo: string;
+  attrs: ReadonlyArray<{ key: string; label: string }>;
+  sample: Record<string, unknown>;
+  data: { atributo: string; valor: number }[];
+}) {
+  return (
+    <section className="rounded-xl border bg-card/30 p-4">
+      <h4 className="mb-3 text-base font-semibold text-foreground">{titulo}</h4>
+      <div className="grid gap-1 sm:grid-cols-2">
+        {attrs.map((a) => (
+          <div
+            key={a.key}
+            className="flex items-center justify-between border-b border-border/40 py-1"
+          >
+            <Label className="text-sm text-foreground">{a.label}</Label>
+            <span className="text-sm font-semibold tabular-nums text-primary">
+              {(sample[a.key] as number | null) ?? "—"}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4 rounded-lg border bg-card/40 p-4">
+        <h5 className="text-center text-base font-semibold text-foreground">
+          Perfil de {titulo}
+        </h5>
+        <div className="h-[340px] w-full sm:h-[380px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <RadarChart data={data} outerRadius="72%">
+              <PolarGrid stroke="hsl(var(--border))" />
+              <PolarAngleAxis
+                dataKey="atributo"
+                tick={{ fill: "hsl(var(--foreground))", fontSize: 11 }}
+              />
+              <PolarRadiusAxis
+                angle={90}
+                domain={[0, 10]}
+                tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
+              />
+              <Radar
+                name={`Perfil de ${titulo.toLowerCase()}`}
+                dataKey="valor"
+                stroke="hsl(var(--primary))"
+                fill="hsl(var(--primary))"
+                fillOpacity={0.45}
+              />
+              <Tooltip />
+              <Legend />
+            </RadarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </section>
   );
 }

@@ -56,19 +56,27 @@ type FormState = {
   notas_extras: string;
 };
 
-const escalaAttrs = [
+const gostoAttrs = [
   { key: "escala_docura", label: "Doçura" },
   { key: "escala_acidez", label: "Acidez" },
   { key: "escala_salinidade", label: "Salinidade" },
   { key: "escala_amargor", label: "Amargor" },
+  { key: "escala_umami", label: "Umami" },
+] as const;
+
+const aromaAttrs = [
   { key: "escala_floral", label: "Floral" },
   { key: "escala_frutado", label: "Frutado" },
   { key: "escala_quente", label: "Quente / Aquecido" },
   { key: "escala_aromatico", label: "Aromático" },
-  { key: "escala_quimico", label: "Químico" },
   { key: "escala_vegetal", label: "Vegetal" },
+  { key: "escala_amadeirado", label: "Amadeirado" },
+  { key: "escala_quimico", label: "Químico" },
   { key: "escala_animal", label: "Animal" },
+  { key: "escala_alterado", label: "Alterado / Fermentativo" },
 ] as const;
+
+const escalaAttrs = [...gostoAttrs, ...aromaAttrs] as const;
 
 type EscalaKey = (typeof escalaAttrs)[number]["key"];
 type EscalaState = Record<EscalaKey, number>;
@@ -275,7 +283,11 @@ function Index() {
     setEscala(emptyEscala);
   }
 
-  const radarData = escalaAttrs.map((a) => ({
+  const gostoData = gostoAttrs.map((a) => ({
+    atributo: a.label,
+    valor: escala[a.key],
+  }));
+  const aromaData = aromaAttrs.map((a) => ({
     atributo: a.label,
     valor: escala[a.key],
   }));
@@ -462,56 +474,23 @@ function Index() {
                 automaticamente o perfil sensorial do mel no gráfico de radar.
               </p>
 
-              <div className="space-y-5">
-                {escalaAttrs.map((a) => (
-                  <div key={a.key} className="grid grid-cols-[7rem_1fr_2.5rem] items-center gap-4 sm:grid-cols-[9rem_1fr_2.5rem]">
-                    <Label className="text-sm font-medium text-foreground">{a.label}</Label>
-                    <Slider
-                      min={1}
-                      max={10}
-                      step={1}
-                      value={[escala[a.key]]}
-                      onValueChange={(v) =>
-                        setEscala((s) => ({ ...s, [a.key]: v[0] }))
-                      }
-                    />
-                    <span className="text-right text-sm font-semibold tabular-nums text-primary">
-                      {escala[a.key]}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              <EscalaGrupo
+                titulo="Gostos"
+                attrs={gostoAttrs}
+                escala={escala}
+                setEscala={setEscala}
+                data={gostoData}
+                nomeSerie="Perfil de gostos"
+              />
 
-              <div className="rounded-lg border bg-card/40 p-4">
-                <h3 className="text-center text-base font-semibold text-foreground">
-                  Perfil Sensorial do Mel
-                </h3>
-                <div className="h-[380px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <RadarChart data={radarData} outerRadius="75%">
-                      <PolarGrid stroke="hsl(var(--border))" />
-                      <PolarAngleAxis
-                        dataKey="atributo"
-                        tick={{ fill: "hsl(var(--foreground))", fontSize: 12 }}
-                      />
-                      <PolarRadiusAxis
-                        angle={90}
-                        domain={[0, 10]}
-                        tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
-                      />
-                      <Radar
-                        name="Intensidade sensorial"
-                        dataKey="valor"
-                        stroke="hsl(var(--primary))"
-                        fill="hsl(var(--primary))"
-                        fillOpacity={0.45}
-                      />
-                      <Tooltip />
-                      <Legend />
-                    </RadarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
+              <EscalaGrupo
+                titulo="Aromas"
+                attrs={aromaAttrs}
+                escala={escala}
+                setEscala={setEscala}
+                data={aromaData}
+                nomeSerie="Perfil de aromas"
+              />
             </CardContent>
           </Card>
 
@@ -534,6 +513,80 @@ function Index() {
         </form>
       </main>
     </div>
+  );
+}
+
+function EscalaGrupo({
+  titulo,
+  attrs,
+  escala,
+  setEscala,
+  data,
+  nomeSerie,
+}: {
+  titulo: string;
+  attrs: ReadonlyArray<{ key: EscalaKey; label: string }>;
+  escala: EscalaState;
+  setEscala: React.Dispatch<React.SetStateAction<EscalaState>>;
+  data: { atributo: string; valor: number }[];
+  nomeSerie: string;
+}) {
+  return (
+    <section className="space-y-5 rounded-xl border bg-card/30 p-4 sm:p-5">
+      <h3 className="text-lg font-semibold tracking-tight text-foreground">{titulo}</h3>
+
+      <div className="space-y-5">
+        {attrs.map((a) => (
+          <div
+            key={a.key}
+            className="grid grid-cols-[7rem_1fr_2.5rem] items-center gap-4 sm:grid-cols-[9rem_1fr_2.5rem]"
+          >
+            <Label className="text-sm font-medium text-foreground">{a.label}</Label>
+            <Slider
+              min={1}
+              max={10}
+              step={1}
+              value={[escala[a.key]]}
+              onValueChange={(v) => setEscala((s) => ({ ...s, [a.key]: v[0] }))}
+            />
+            <span className="text-right text-sm font-semibold tabular-nums text-primary">
+              {escala[a.key]}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div className="rounded-lg border bg-card/40 p-4">
+        <h4 className="text-center text-base font-semibold text-foreground">
+          Perfil de {titulo}
+        </h4>
+        <div className="h-[340px] w-full sm:h-[380px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <RadarChart data={data} outerRadius="72%">
+              <PolarGrid stroke="hsl(var(--border))" />
+              <PolarAngleAxis
+                dataKey="atributo"
+                tick={{ fill: "hsl(var(--foreground))", fontSize: 11 }}
+              />
+              <PolarRadiusAxis
+                angle={90}
+                domain={[0, 10]}
+                tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
+              />
+              <Radar
+                name={nomeSerie}
+                dataKey="valor"
+                stroke="hsl(var(--primary))"
+                fill="hsl(var(--primary))"
+                fillOpacity={0.45}
+              />
+              <Tooltip />
+              <Legend />
+            </RadarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </section>
   );
 }
 

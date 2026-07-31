@@ -18,6 +18,8 @@ export type Database = {
         Row: {
           created_at: string
           escala_acidez: number | null
+          escala_alterado: number | null
+          escala_amadeirado: number | null
           escala_amargor: number | null
           escala_animal: number | null
           escala_aromatico: number | null
@@ -27,6 +29,7 @@ export type Database = {
           escala_quente: number | null
           escala_quimico: number | null
           escala_salinidade: number | null
+          escala_umami: number | null
           escala_vegetal: number | null
           gosto_acido: string | null
           gosto_amargo: string | null
@@ -51,6 +54,8 @@ export type Database = {
         Insert: {
           created_at?: string
           escala_acidez?: number | null
+          escala_alterado?: number | null
+          escala_amadeirado?: number | null
           escala_amargor?: number | null
           escala_animal?: number | null
           escala_aromatico?: number | null
@@ -60,6 +65,7 @@ export type Database = {
           escala_quente?: number | null
           escala_quimico?: number | null
           escala_salinidade?: number | null
+          escala_umami?: number | null
           escala_vegetal?: number | null
           gosto_acido?: string | null
           gosto_amargo?: string | null
@@ -84,6 +90,8 @@ export type Database = {
         Update: {
           created_at?: string
           escala_acidez?: number | null
+          escala_alterado?: number | null
+          escala_amadeirado?: number | null
           escala_amargor?: number | null
           escala_animal?: number | null
           escala_aromatico?: number | null
@@ -93,6 +101,7 @@ export type Database = {
           escala_quente?: number | null
           escala_quimico?: number | null
           escala_salinidade?: number | null
+          escala_umami?: number | null
           escala_vegetal?: number | null
           gosto_acido?: string | null
           gosto_amargo?: string | null
