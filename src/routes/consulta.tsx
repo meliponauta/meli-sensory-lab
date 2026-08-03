@@ -309,7 +309,7 @@ function GrupoResultado({
         <div className="h-[340px] w-full sm:h-[380px]">
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart data={data} outerRadius="72%">
-              <PolarGrid stroke="hsl(var(--border))" />
+              <PolarGrid gridType="polygon" stroke="hsl(var(--border))" />
               <PolarAngleAxis
                 dataKey="atributo"
                 tick={{ fill: "hsl(var(--foreground))", fontSize: 11 }}
