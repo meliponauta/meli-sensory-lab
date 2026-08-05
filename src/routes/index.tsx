@@ -563,7 +563,12 @@ function EscalaGrupo({
         <div className="h-[340px] w-full sm:h-[380px]">
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart data={data} outerRadius="72%">
-              <PolarGrid gridType="polygon" stroke="hsl(var(--border))" />
+              <PolarGrid
+                gridType="polygon"
+                radialLines
+                stroke="hsl(var(--border))"
+                strokeOpacity={0.7}
+              />
               <PolarAngleAxis
                 dataKey="atributo"
                 tick={{ fill: "hsl(var(--foreground))", fontSize: 11 }}
@@ -571,14 +576,18 @@ function EscalaGrupo({
               <PolarRadiusAxis
                 angle={90}
                 domain={[0, 10]}
+                tickCount={6}
                 tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
+                axisLine={false}
               />
               <Radar
                 name={nomeSerie}
                 dataKey="valor"
                 stroke="hsl(var(--primary))"
                 fill="hsl(var(--primary))"
-                fillOpacity={0.45}
+                fillOpacity={0.4}
+                strokeWidth={2}
+                dot={{ r: 3, fill: "hsl(var(--primary))" }}
               />
               <Tooltip />
               <Legend />
